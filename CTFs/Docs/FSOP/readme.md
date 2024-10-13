@@ -1,6 +1,7 @@
 # Dive into FSOP (P1)
 FSOP là tên viết tắt của File Stream Oriented Programming. Kĩ thuật này có thể dẫn đến arbitrary read/write hoặc thậm chí là RCE thông qua việc lợi dụng cấu trúc luồng tệp GLIBC để thực thi mã do memory corruption. 
 Các mục tiêu phổ biến nhất của FSOP là `stdin`, `stdout` và `stderr` vì chúng được hầu hết các chương trình sử dụng. Bên cạnh đó, kĩ thuật này vẫn có thể được sử dụng trên các files hoặc socket, miễn là chúng được "wrap" trong một stream (vd: sử dụng `fopen` thay vì `open` chẳng hạn)
+
 Kĩ thuật này đã trở nên rất phổ biến kể từ khi các con trỏ `__malloc_hook`, `__free_hook` và tất cả các con trỏ khác đã bị xóa khỏi GLIBC trong phiên bản 2.34.
 
 Tuy đã đọc khá nhiều writeups về chủ đề này nhưng bản thân mình vẫn còn cảm thấy khá mơ hồ. Hơn nữa đây vẫn là một kĩ thuật rất mạnh, có thể sử dụng trong các libc hiện đại. Do vậy mình quyết định viết một bài tổng hợp về kĩ thuật này để chuẩn bị cho các CTF challenge khác trong tương lai.
