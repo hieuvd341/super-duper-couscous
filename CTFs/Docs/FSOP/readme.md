@@ -729,6 +729,10 @@ Nếu `vtable` không hợp lệ, chương trình sẽ dừng lại và báo l�
 Tuy nhiên thì vẫn có những cách để đạt được RCE bằng cách bypass vtable check. Điều đó dẫn ta đến phần tiếp theo: **Advance FSOP attack**
 
 ## III. Advance FSOP attack
+Trong quá trình nhặt nhạnh trên mạng, mình tìm thấy một vài bài viết về bypass vtable check. Tuy nhiên do thời điểm viết bài cũng đã khá lâu nên mình cũng không biết được kĩ thuật nào còn có thể sử dụng.
+
+Trong phần này mình sẽ cố gắng dựng lại các cách tấn công, nhưng sử dụng trên libc-2.35, để tìm những cách tấn công còn có thể sử dụng trong các libc hiện tại
+
 ### 1. Đầu tiên là cách tấn công của `Dhaval Kapil`
 #### 1.1. Ý tưởng
 Với cách tấn công này, ta sẽ làm cho `vtable` trỏ đến một địa chỉ đã nằm sẵn bên trong vùng `__libc_IO_vtables`. `_IO_str_jumps` cũng nằm ở đây. Nó chứa một con trỏ tới hàm `_IO_str_overflow` rất hữu ích cho việc tấn công của chúng ta.
@@ -822,15 +826,20 @@ struct _IO_wide_data
 ```
 
 **Fully exploit**
-1. Fake `file.wide_data` tại 1 vùng nhớ ta kiểm soát được.
+1. Fake `file._wide_vtable` tại 1 vùng nhớ ta kiểm soát được.
 2. `file.wide_data -> vtable` trỏ đến exploit_vtable
 3. overwrite `file.vtable` sao cho `IO_wfile_overflow` được gọi.
 4. `do_allocbuf` sẽ được gọi.
 5. `do_allocbuf` sẽ gọi `wide_data vtable` **with no check**.
 #### 2.2. Demo
-Ở đây mình sẽ sử dụng chương trình [demo1](./Advanced_FSOP/pwn_college/demo1), libc sử dụng là 2.35 của ubuntu-22.04.
+Ở đây mình sẽ sử dụng chương trình [demo1.c](./Advanced_FSOP/pwn_college/demo1.c), libc sử dụng là 2.35 của ubuntu-22.04.
 
-Luồng hoạt động của chương trình này khá đơn giản. Chỉ là leak stack và code base cho người dùng. Ngoài ra cũng cho người dùng quyền ghi đè vào file structure. Mục tiêu là chuyển luồng chương trình về `win`.
+Luồng hoạt động của chương trình này khá đơn giản. Chỉ là leak stack và code base cho người dùng. Ngoài ra cũng cho người dùng quyền ghi đè và thay đổi file structure. Mục tiêu là chuyển luồng chương trình về `win`.
+
+Ý tưởng exploit: 
+- Tạo fake `wide_data` và fake `vtable` ở `stack`
+- overwrite `file_pointer.vtable` sao cho `IO_wfile_overflow` được gọi.
+- get shell (nếu kĩ thuật này thực sự thực hiện được)
 
 
 ### 3. FSROP

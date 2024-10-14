@@ -26,6 +26,6 @@ int main(int argc, char **argv) {
     // Call fwrite on the file
     puts("Calling fwrite");
     fwrite(buf, 1, 10, file_pointer);
-
+    
     exit(0);
 }
