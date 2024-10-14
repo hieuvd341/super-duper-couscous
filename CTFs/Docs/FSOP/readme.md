@@ -689,10 +689,17 @@ IO_validate_vtable (const struct _IO_jump_t *vtable)
   return vtable;
 }
 ```
-Hàm kiểm tra xem con trỏ `vtable` có nằm trong phần `__libc_IO_vtables` hay không.
+Hàm kiểm tra xem con trỏ `vtable` có nằm trong phần `__libc_IO_vtables` hay không, bằng cách so sánh offset giữa vtable pointer hiện tại với `__start___libc_IO_vtables` có lớn hơn offset giữa `__stop___libc_IO_vtables` và `__start___libc_IO_vtables` không. Nếu có lớn hơn thì rõ ràng là fake rồi.
 
 > Vùng này chứa một số `vtable` thuộc kiểu `_IO_jump_t`. `vtable` gốc cũng nằm trong đó.
-
+> Ta có thể xem địa chỉ của vùng `__libc_IO_vtables` bằng cách sử dụng gdb
+> ```
+> pwndbg> p __stop___libc_IO_vtables
+> $1 = 0x7f4d4b09a768 ""
+> pwndbg> p __start___libc_IO_vtables
+> $2 = 0x7f4d4b099a00 <_IO_helper_jumps> ""
+> ```
+>
 
 Nếu không, nó sẽ tiếp tục gọi đến `_IO_vtable_check`.
 
