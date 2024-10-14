@@ -843,17 +843,24 @@ Luồng hoạt động của chương trình này khá đơn giản. Chỉ là l
 - overwrite `file_pointer.vtable` sao cho `IO_wfile_overflow` được gọi.
 - get shell (nếu kĩ thuật này thực sự thực hiện được)
 
-Tuy nhiên thì khi thực hiện tấn công thì mình gặp phải **vtable check** và bị nó chém.
+> Trong quá trình thực hiện demo thì payload mình bị vtable check chém một lần. Hụt hẫng các thứ vì nghĩ là mất công setup nma chẳng được gì.
+> 
+> ![alt text](image-20.png)
+> 
+> Ở dưới phần comment cũng không khá khẩm hơn.
+>
+> ![alt text](image-21.png)
+>
+> ![alt text](image-22.png)
+>
+> Ban đầu dự định của mình phần này là các bước để dẫn đến exploit fail. Nhưng sáng hôm sau đọc lại source code libc thì khả năng là cách tấn công này vẫn có thể áp dụng được.
+> Thay vì chán nản thì mình chuyển qua lười. 
+> Mình cũng đã modify demo1.c một chút để thuận tiện cho việc demo hơn
 
-![alt text](image-20.png)
 
-Ở dưới phần comment cũng không khá khẩm hơn.
 
-![alt text](image-21.png)
 
-![alt text](image-22.png)
 
-Cho nên phần này mình sẽ nói về quá trình exploit fail. Hi vọng vào một ngày đẹp trời nào đó, ai đó sẽ chỉ ra mình sai ở bước nào đấy và kĩ thuật này vẫn còn sử dụng được.
 ### 3. FSROP
 # Refs
 - https://stackoverflow.com/questions/1658476/c-fopen-vs-open
