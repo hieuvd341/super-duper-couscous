@@ -731,7 +731,7 @@ Tuy nhiên thì vẫn có những cách để đạt được RCE bằng cách b
 ## III. Advance FSOP attack
 Trong quá trình nhặt nhạnh trên mạng, mình tìm thấy một vài bài viết về bypass vtable check. Tuy nhiên do thời điểm viết bài cũng đã khá lâu nên mình cũng không biết được kĩ thuật nào còn có thể sử dụng.
 
-Trong phần này mình sẽ cố gắng dựng lại các cách tấn công, nhưng sử dụng trên libc-2.35, để tìm những cách tấn công còn có thể sử dụng trong các libc hiện tại
+Trong phần này mình sẽ cố gắng dựng lại các cách tấn công, nhưng sử dụng trên `libc-2.35`, để tìm những cách tấn công còn có thể sử dụng trong các libc hiện tại.
 
 ### 1. Đầu tiên là cách tấn công của `Dhaval Kapil`
 #### 1.1. Ý tưởng
@@ -784,7 +784,9 @@ Chúng ta sẽ ghi đè `vtable` theo cách sao cho thay vì gọi hàm liên k�
 
 ### 2. Pwn college 
 
-Video của họ có vẻ cũng mới nên mình hi vọng kĩ thuật này còn có thể sử dụng được.
+Kĩ thuật này không còn tận dụng được nữa. Mình đã mất khá nhiều thời gian để debug chứng minh là nó không thể sử dụng được.
+Nếu như có ai hứng thú thì đọc cho biết thôi.
+
 #### 2.1. Về ý tưởng
 Cũng như bên trên, ta sẽ tìm cách để gọi đến `IO_wfile_overflow`
 Hàm này gọi đến `do_allocbuf`
@@ -841,7 +843,17 @@ Luồng hoạt động của chương trình này khá đơn giản. Chỉ là l
 - overwrite `file_pointer.vtable` sao cho `IO_wfile_overflow` được gọi.
 - get shell (nếu kĩ thuật này thực sự thực hiện được)
 
+Tuy nhiên thì khi thực hiện tấn công thì mình gặp phải **vtable check** và bị nó chém.
 
+![alt text](image-20.png)
+
+Ở dưới phần comment cũng không khá khẩm hơn.
+
+![alt text](image-21.png)
+
+![alt text](image-22.png)
+
+Cho nên phần này mình sẽ nói về quá trình exploit fail. Hi vọng vào một ngày đẹp trời nào đó, ai đó sẽ chỉ ra mình sai ở bước nào đấy và kĩ thuật này vẫn còn sử dụng được.
 ### 3. FSROP
 # Refs
 - https://stackoverflow.com/questions/1658476/c-fopen-vs-open
@@ -853,3 +865,4 @@ Luồng hoạt động của chương trình này khá đơn giản. Chỉ là l
 - https://www.youtube.com/watch?v=Fr3VU5hdL4s&t=1245s&ab_channel=HackInTheBoxSecurityConference
 - https://ctf-wiki.mahaloz.re/pwn/linux/io_file/introduction/
 - https://www.youtube.com/watch?v=vkUR58xxSFI&list=PL-ymxv0nOtqrD-3LwVyyUu83kNJBI9RVL&t=10s
+- https://github.com/mahaloz/ctf-wiki-en/blob/master/docs/pwn/linux/io_file/exploit-in-libc2.24.md
