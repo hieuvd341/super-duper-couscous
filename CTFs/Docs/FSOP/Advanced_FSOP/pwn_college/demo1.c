@@ -6,7 +6,13 @@ void win() {
     puts("You win!");
 }
 
+void init () {
+    setbuf(stdin, NULL);
+    setbuf(stdout, NULL);
+    setbuf(stderr, NULL);
+}
 int main(int argc, char **argv) {
+    init();
     char buf[0x1000];
     long long address;
     long long value;
@@ -18,7 +24,8 @@ int main(int argc, char **argv) {
 
     // Open a file
     FILE *file_pointer = fopen("/dev/null", "w");
-
+    // print file pointer
+    printf("File pointer: %p\n", file_pointer);
     
 
     // Give user arbitrary write

@@ -701,8 +701,7 @@ Hàm kiểm tra xem con trỏ `vtable` có nằm trong phần `__libc_IO_vtables
 > ```
 >
 
-Nếu không, nó sẽ tiếp tục gọi đến `_IO_vtable_check`.
-
+Nếu không thoả mãn, nó sẽ tiếp tục gọi đến `_IO_vtable_check`.
 
 ```c
 void attribute_hidden
@@ -791,9 +790,6 @@ Chúng ta sẽ ghi đè `vtable` theo cách sao cho thay vì gọi hàm liên k�
 
 ### 2. Pwn college 
 
-Kĩ thuật này không còn tận dụng được nữa. Mình đã mất khá nhiều thời gian để debug chứng minh là nó không thể sử dụng được.
-Nếu như có ai hứng thú thì đọc cho biết thôi.
-
 #### 2.1. Về ý tưởng
 Cũng như bên trên, ta sẽ tìm cách để gọi đến `IO_wfile_overflow`
 Hàm này gọi đến `do_allocbuf`
@@ -838,19 +834,24 @@ struct _IO_wide_data
 1. Fake `file._wide_vtable` tại 1 vùng nhớ ta kiểm soát được.
 2. `file.wide_data -> vtable` trỏ đến exploit_vtable
 3. overwrite `file.vtable` sao cho `IO_wfile_overflow` được gọi.
-4. `do_allocbuf` sẽ được gọi.
-5. `do_allocbuf` sẽ gọi `wide_data vtable` **with no check**.
+4. `_IO_wdoallocbuf` sẽ được gọi.
+5. `_IO_wdoallocbuf` sẽ gọi `_IO_wide_data.vtable` **with no check**.
 #### 2.2. Demo
 Ở đây mình sẽ sử dụng chương trình [demo1.c](./Advanced_FSOP/pwn_college/demo1.c), libc sử dụng là 2.35 của ubuntu-22.04.
 
-Luồng hoạt động của chương trình này khá đơn giản. Chỉ là leak stack và code base cho người dùng. Ngoài ra cũng cho người dùng quyền ghi đè và thay đổi file structure. Mục tiêu là chuyển luồng chương trình về `win`.
+Luồng hoạt động của chương trình này khá đơn giản. Chỉ là leak hết tất cả mọi thứ có thể leak cho người dùng(theo mình thấy thì để thực hiện tấn công sẽ cần ít nhất là heap base và libcbase + có chỗ để fake `_wide_data`). Ngoài ra cũng cho người dùng quyền ghi đè và thay đổi file structure. Mục tiêu là chuyển luồng chương trình về `win`.
 
-Ý tưởng exploit: 
-- Tạo fake `wide_data` và fake `vtable` ở `stack`
+Đại khái là mục tiêu như thế này
+
+![alt text](image-23.png)
+
+**Ý tưởng exploit:** 
+- Tạo fake `wide_data` và fake `vtable` ở `stack` (`_flag` sẽ cần được tính để có thể gọi đến `IO_wfile_overflow` và `_IO_wdoallocbuf`)
 - overwrite `file_pointer.vtable` sao cho `IO_wfile_overflow` được gọi.
-- get shell (nếu kĩ thuật này thực sự thực hiện được)
+- overwrite `file_pointer._wide_data` trỏ đến fake `_wide_data` ở stack
+- `_IO_wdoallocbuf` sẽ gọi `_IO_wide_data.vtable` **with no check**.
 
-> Trong quá trình thực hiện demo thì payload mình bị vtable check chém một lần. Hụt hẫng các thứ vì nghĩ là mất công setup nma chẳng được gì.
+> Trong quá trình thực hiện demo thì payload mình bị vtable check chém một lần. Hụt hẫng các thứ vì nghĩ là mất công setup nma lại gặp kĩ thuật không dùng được.
 > 
 > ![alt text](image-20.png)
 > 
@@ -862,7 +863,9 @@ Luồng hoạt động của chương trình này khá đơn giản. Chỉ là l
 >
 > Ban đầu dự định của mình phần này là các bước để dẫn đến exploit fail. Nhưng sáng hôm sau đọc lại source code libc thì khả năng là cách tấn công này vẫn có thể áp dụng được.
 > Thay vì chán nản thì mình chuyển qua lười. 
-> Mình cũng đã modify demo1.c một chút để thuận tiện cho việc demo hơn
+> Mình cũng đã modify demo1.c một chút để thuận tiện cho việc demo hơn.
+
+
 
 
 
