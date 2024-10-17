@@ -865,11 +865,60 @@ Luồng hoạt động của chương trình này khá đơn giản. Chỉ là l
 > Thay vì chán nản thì mình chuyển qua lười. 
 > Mình cũng đã modify demo1.c một chút để thuận tiện cho việc demo hơn.
 
+Về quá trình debug rồi setup các địa chỉ thì mình sẽ không viết lại nữa. Thực sự là ý tưởng giống hệt như trên. POC (hơi đần tí) có thể tham khảo ở [solve.py](./Advanced_FSOP/pwn_college/solve.py)
 
+Giải thích qua một tí lí do ta có thể gọi `win` mà không bị vtable check chém
+- Ta xét hàm `_IO_wdoallocbuf`
+```C
+void
+_IO_wdoallocbuf (FILE *fp)
+{
+  if (fp->_wide_data->_IO_buf_base)
+    return;
+  if (!(fp->_flags & _IO_UNBUFFERED))
+    if ((wint_t)_IO_WDOALLOCATE (fp) != WEOF)
+      return;
+  _IO_wsetb (fp, fp->_wide_data->_shortbuf,
+		     fp->_wide_data->_shortbuf + 1, 0);
+}
+libc_hidden_def (_IO_wdoallocbuf)
+```
 
+Ta gọi hàm `win` thông qua `_IO_WDOALLOCATE (fp)`
 
+- `_IO_WDOALLOCATE (fp)` lại được định nghĩa như sau:
 
+```C
+#define _IO_WDOALLOCATE(FP) WJUMP0 (__doallocate, FP)
+```
 
+Đây chính là điểm tạo ra khác biệt. 
+Khi mình so sánh code của 2 macro `JUMP` và `WJUMP` thì thấy `WJUMP` hoàn toàn không gọi đến `IO_validate_vtable`
+
+- `JUMP0` nè
+
+```C
+#define _IO_DOALLOCATE(FP) JUMP0 (__doallocate, FP)
+#define JUMP0(FUNC, THIS) (_IO_JUMPS_FUNC(THIS)->FUNC) (THIS)
+
+# define _IO_JUMPS_FUNC(THIS) \
+  (IO_validate_vtable                                                   \
+   (*(struct _IO_jump_t **) ((void *) &_IO_JUMPS_FILE_plus (THIS)	\
+			     + (THIS)->_vtable_offset)))
+``` 
+
+- `WJUMP0` nè
+
+```C
+#define _IO_WDOALLOCATE(FP) WJUMP0 (__doallocate, FP)
+#define WJUMP0(FUNC, THIS) (_IO_WIDE_JUMPS_FUNC(THIS)->FUNC) (THIS)
+#define _IO_WIDE_JUMPS_FUNC(THIS) _IO_WIDE_JUMPS(THIS)
+#define _IO_WIDE_JUMPS(THIS) \
+  _IO_CAST_FIELD_ACCESS ((THIS), struct _IO_FILE, _wide_data)->_wide_vtable
+```
+Nói chung là không có cái check nào ở đây cả.
+
+**🥳 +1 kĩ thuật dùng được**
 
 ### 3. FSROP
 # Refs
