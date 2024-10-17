@@ -893,7 +893,7 @@ Ta gọi hàm `win` thông qua `_IO_WDOALLOCATE (fp)`
 ```
 
 Đây chính là điểm tạo ra khác biệt. 
-Khi mình so sánh code của 2 macro `JUMP` và `WJUMP` thì thấy `WJUMP` hoàn toàn không gọi đến `IO_validate_vtable`
+Khi mình so sánh code của 2 macro `JUMP0` và `WJUMP0` thì thấy `WJUMP0` hoàn toàn không gọi đến `IO_validate_vtable`
 
 - `JUMP0` nè
 
