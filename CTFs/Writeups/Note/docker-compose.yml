@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  challenge:
+    build: .
+    container_name: binary_exploit_chall
+    ports:
+      - "1611:1611"
+    restart: always
+
