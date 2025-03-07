@@ -20,8 +20,8 @@ grass@grass:/mnt/d/CTFs/2025/BKSEC-recruitment/note/chal$ pwn checksec chall
 - **Libc: 2.39 - Ubuntu-24.04**
 
 ## II. Reverse
-- Mình đã đổi tên các biến và tạo struct đối với file `chall.i64`. Phần tiếp theo của writeup mình sẽ dùng tên biến như trong file này. Để đồng bộ thì các bạn có thể tải file tại [đây](./chall.i64)
-- Với các bạn làm pwn, mình kì vọng các bạn sẽ ít nhất phải đọc hiểu được pseudocode của chương trình, nên mình sẽ không đi sâu vào phần rev nữa. Tuy nhiên đây cũng là một phần rất quan trọng, nếu các bạn chưa hiểu rõ chương trình thì sẽ rất khó để tìm ra lỗ hổng và exploit được. Do vậy nên là, again, **nếu bạn nào chưa rev chương trình thì nên đọc [file này](./chall.i64) của mình trước**. Tin mình đi, mình làm nó dễ đọc hết sức có thể rồi.
+- Mình đã đổi tên các biến và tạo struct đối với file `chall.i64`. Phần tiếp theo của writeup mình sẽ dùng tên biến như trong file này. Để đồng bộ thì các bạn có thể tải file tại [đây]([./chall.i64](https://github.com/hieuvd341/super-duper-couscous/blob/master/CTFs/Writeups/Note/chall.i64))
+- Với các bạn làm pwn, mình kì vọng các bạn sẽ ít nhất phải đọc hiểu được pseudocode của chương trình, nên mình sẽ không đi sâu vào phần rev nữa. Tuy nhiên đây cũng là một phần rất quan trọng, nếu các bạn chưa hiểu rõ chương trình thì sẽ rất khó để tìm ra lỗ hổng và exploit được. Do vậy nên là, again, **nếu bạn nào chưa rev chương trình thì nên đọc [file này]([./chall.i64](https://github.com/hieuvd341/super-duper-couscous/blob/master/CTFs/Writeups/Note/chall.i64)) của mình trước**. Tin mình đi, mình làm nó dễ đọc hết sức có thể rồi.
 
 ## III. Vulnerability
 #### 1. Heap overflow
